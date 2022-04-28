@@ -1,17 +1,16 @@
-use std::vec;
 use std::collections::HashMap;
 
+
+const name: &str = "name";
+const id: &str = "id";
 struct Node<'a> {
     id: &'a str,
     name: &'a str,
     links: Vec<u32>
 }
 
-const name: &str = "name";
-const id: &str = "id";
-
-impl Node<'b> {
-    fn serialize(self) -> HashMap<&'static str, &'static str> {
+impl Node<'_> {
+    fn serialize(&self) -> HashMap<&str, &str> {
         // TODO: from rust doc
         // "The default hashing algorithm is currently SipHash 1-3,
         // though this is subject to change at any point in the future.
@@ -25,6 +24,21 @@ impl Node<'b> {
             id, self.id), (name, self.name)
             ])
     }
+}
+
+struct Link<'b> {
+    source: &'b Node<'b>,
+    target: &'b Node<'b>
+}
+
+struct Connection<'c> {
+    nodes: Vec<&'c Node<'c>>
+}
+
+struct Request<'d> {
+    name: &'d str,
+    time_cost: f32,
+    result: u8
 }
 
 
