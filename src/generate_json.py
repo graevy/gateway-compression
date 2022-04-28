@@ -13,6 +13,11 @@ MEAN_CONNECTIONS_PER_SERVER = 2
 # node can be extended into client, server, and gateway,
 # and link can be extended into a broader connection class which has a linkedlist[Link] route field
 
+# notes:
+# build a request object for extensible resource consumption
+# need a generator: client(node) -> array[requests]
+
+
 
 class Node:
     def __init__(self, id, name, links=None):
