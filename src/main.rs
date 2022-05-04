@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use std::{thread, time};
 
 
 const id: &str = "id";
@@ -6,9 +7,10 @@ const name: &str = "name";
 struct Node<'a> {
     id: &'a str,
     name: &'a str,
-    links: Vec<u32>,
+    links: Vec<&'a Member>,
     max_load: f32,
-    current_load: f32
+    current_load: f32,
+    ticks_to_sleep: u32
 }
 struct Server<'b> {
     node: &'b Node<'b>,
@@ -33,6 +35,11 @@ enum Member {
 
 
 impl Node<'_> {
+    fn new(id_: &str, name_: &str, max_load: f32) -> Self {
+        Node {
+            id: id_, name: name_, links: Vec::new(),
+            max_load: max_load, current_load: 0.0, ticks_to_sleep: 0 }
+    }
     fn serialize(&self) -> HashMap<&str, &str> {
         // TODO: from rust doc
         // "The default hashing algorithm is currently SipHash 1-3,
@@ -47,10 +54,17 @@ impl Node<'_> {
             id, self.id), (name, self.name)
             ])
     }
+
+    fn wait(&mut self, duration: u32) {
+        self.ticks_to_sleep += duration;
+    }
+
+
+
 }
 
-// this struct is used for most graphing software
-// otherwise connection is simply vec<node>
+// this struct is used for d3
+// otherwise a connection is simply vec<node>
 // if d3 or similar doesn't get used, scrap it?
 struct Link<'e> {
     source: &'e Node<'e>,
@@ -61,17 +75,22 @@ struct Connection<'f> {
     links: Vec<&'f Link<'f>>
 }
 
-struct Request<'d> {
-    name: &'d str,
+struct Network<'z> {
+    connections: Vec<Connection<'z>>,
+    clients: Vec<Client<'z>>,
+    servers: Vec<Server<'z>>,
+    gateways: Vec<Gateway<'z>>
+}
+
+
+struct Request<'g> {
+    name: &'g str,
     time_cost: f32,
     result: u8
 }
 
-struct Network<'a> {
-    connections: Vec<Connection<'a>>,
-    clients: Vec<Client<'a>>,
-    servers: Vec<Server<'a>>,
-    gateways: Vec<Gateway<'a>>
+enum Action {
+    Request
 }
 
 
