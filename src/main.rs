@@ -15,7 +15,8 @@ struct Server<'b> {
     gateway: &'b Gateway<'b>
 }
 struct Client<'c> {
-    node: &'c Node<'c>
+    node: &'c Node<'c>,
+    gateway: &'c Gateway<'c>
 }
 struct Gateway<'d> {
     node: &'d Node<'d>,
@@ -23,16 +24,11 @@ struct Gateway<'d> {
     servers: Vec<Server<'d>>
 }
 
-trait Networked<T> {
-
-}
-enum Agent {
+enum Member {
     Server,
     Client,
     Gateway
 }
-
-
 
 
 
@@ -53,6 +49,9 @@ impl Node<'_> {
     }
 }
 
+// this struct is used for most graphing software
+// otherwise connection is simply vec<node>
+// if d3 or similar doesn't get used, scrap it?
 struct Link<'e> {
     source: &'e Node<'e>,
     target: &'e Node<'e>
@@ -66,6 +65,13 @@ struct Request<'d> {
     name: &'d str,
     time_cost: f32,
     result: u8
+}
+
+struct Network<'a> {
+    connections: Vec<Connection<'a>>,
+    clients: Vec<Client<'a>>,
+    servers: Vec<Server<'a>>,
+    gateways: Vec<Gateway<'a>>
 }
 
 
