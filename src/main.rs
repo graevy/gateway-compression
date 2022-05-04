@@ -1,13 +1,40 @@
 use std::collections::HashMap;
 
 
-const name: &str = "name";
 const id: &str = "id";
+const name: &str = "name";
 struct Node<'a> {
     id: &'a str,
     name: &'a str,
-    links: Vec<u32>
+    links: Vec<u32>,
+    max_load: f32,
+    current_load: f32
 }
+struct Server<'b> {
+    node: &'b Node<'b>,
+    gateway: &'b Gateway<'b>
+}
+struct Client<'c> {
+    node: &'c Node<'c>
+}
+struct Gateway<'d> {
+    node: &'d Node<'d>,
+    clients: Vec<Client<'d>>,
+    servers: Vec<Server<'d>>
+}
+
+trait Networked<T> {
+
+}
+enum Agent {
+    Server,
+    Client,
+    Gateway
+}
+
+
+
+
 
 impl Node<'_> {
     fn serialize(&self) -> HashMap<&str, &str> {
@@ -26,13 +53,13 @@ impl Node<'_> {
     }
 }
 
-struct Link<'b> {
-    source: &'b Node<'b>,
-    target: &'b Node<'b>
+struct Link<'e> {
+    source: &'e Node<'e>,
+    target: &'e Node<'e>
 }
 
-struct Connection<'c> {
-    nodes: Vec<&'c Node<'c>>
+struct Connection<'f> {
+    links: Vec<&'f Link<'f>>
 }
 
 struct Request<'d> {
