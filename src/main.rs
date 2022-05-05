@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 use std::{thread, time};
+use std::rc::Rc;
 
 
 const id: &str = "id";
@@ -35,7 +36,7 @@ enum Member {
 
 
 impl Node<'_> {
-    fn new(id_: &str, name_: &str, max_load: f32) -> Self {
+    fn new(id_: &str, name_: &str, max_load: f32) -> Node {
         Node {
             id: id_, name: name_, links: Vec::new(),
             max_load: max_load, current_load: 0.0, ticks_to_sleep: 0 }
