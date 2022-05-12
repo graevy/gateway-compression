@@ -1,4 +1,6 @@
+use serde::{Serialize, Serializer, ser::SerializeStruct};
 use std::collections::HashMap;
+
 
 const id: &str = "id";
 const name: &str = "name";
@@ -36,6 +38,19 @@ enum Member {
     Gateway
 }
 
+// this looks like it works, still need to handle json dumping
+impl Serialize for Node {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        let mut state = serializer.serialize_struct("Node", 2)?;
+        state.serialize_field("id", &self.id)?;
+        state.serialize_field("name", &self.name)?;
+        state.end()
+    }
+}
+
 impl Node {
     fn new(id_: String, name_: String, max_load: f32) -> Node {
         Node {
@@ -43,31 +58,31 @@ impl Node {
             max_load: max_load, current_load: 0.0, ticks_to_sleep: 0 }
     }
 
-    fn serialize(&self) -> HashMap<&str, &String> {
-        // TODO: from rust doc
-        // "The default hashing algorithm is currently SipHash 1-3,
-        // though this is subject to change at any point in the future.
-        // While its performance is very competitive for medium sized keys,
-        // other hashing algorithms will outperform it for small keys such
-        // as integers as well as large keys such as long strings, though those
-        // algorithms will typically not protect against attacks such as HashDoS.
-        // The hashing algorithm can be replaced on a per-HashMap basis using
-        // the default, with_hasher, and with_capacity_and_hasher methods."
-        HashMap::from([(
-            id, &self.id), (name, &self.name)
-            ])
-    }
+    // fn serialize(&self) -> HashMap<&str, &String> {
+    //     // TODO: from rust doc
+    //     // "The default hashing algorithm is currently SipHash 1-3,
+    //     // though this is subject to change at any point in the future.
+    //     // While its performance is very competitive for medium sized keys,
+    //     // other hashing algorithms will outperform it for small keys such
+    //     // as integers as well as large keys such as long strings, though those
+    //     // algorithms will typically not protect against attacks such as HashDoS.
+    //     // The hashing algorithm can be replaced on a per-HashMap basis using
+    //     // the default, with_hasher, and with_capacity_and_hasher methods."
+    //     HashMap::from([(
+    //         id, &self.id), (name, &self.name)
+    //         ])
+    // }
 
     fn wait(&mut self, duration: u32) {
         self.ticks_to_sleep += duration;
     }
 }
 
-// impl<'a> Client<'a> {
-//     fn generate_request(name: String, time_cost: f32, result: u8) -> Request {
-//         Request {name: name, time_cost: time_cost, result: result }
-//     }
-// }
+impl<'cr> Client<'cr> {
+    fn generate_request(name_: String, time_cost: f32, result: u8) -> Request {
+        Request {name: name_, time_cost: time_cost, result: result }
+    }
+}
 
 // this struct is used for d3
 // otherwise a connection is simply vec<node>
@@ -95,7 +110,7 @@ struct Request {
 }
 
 fn main() {
-    let net = Network {
+    let net: Network = Network {
         connections: Vec::new(),
         clients: Vec::new(),
         servers: Vec::new(),
