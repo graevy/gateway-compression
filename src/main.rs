@@ -1,7 +1,4 @@
 use std::collections::HashMap;
-use std::{thread, time};
-use std::rc::Rc;
-
 
 const id: &str = "id";
 const name: &str = "name";
@@ -96,5 +93,10 @@ enum Action {
 
 
 fn main() {
-    println!("Hello, world!");
+    let net = Network {
+        connections: Vec::new(),
+        clients: Vec::new(),
+        servers: Vec::new(),
+        gateways: Vec::new()
+    };
 }
