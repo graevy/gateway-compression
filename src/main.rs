@@ -1,6 +1,4 @@
 use std::collections::HashMap;
-use std::{thread, time};
-use std::rc::Rc;
 
 
 const id: &str = "id";
@@ -13,20 +11,24 @@ struct Node {
     ticks_to_sleep: u32
 }
 
-struct Client<'a> {
+const client_label: &str = "client_";
+struct Client<'c> {
     node: Node,
-    gateway: &'a Gateway<'a>
+    gateway: &'c Gateway<'c>
 }
 
-struct Server<'b> {
+const server_label: &str = "server";
+struct Server<'s> {
     node: Node,
-    gateway: &'b Gateway<'b>
+    gateway: &'s Gateway<'s>
 
 }
-struct Gateway<'c> {
+
+const gateway_label: &str = "gateway";
+struct Gateway<'g> {
     node: Node,
-    clients: Vec<&'c Client<'c>>,
-    servers: Vec<&'c Server<'c>>
+    clients: Vec<&'g Client<'g>>,
+    servers: Vec<&'g Server<'g>>
 }
 
 enum Member {
@@ -34,8 +36,6 @@ enum Member {
     Client,
     Gateway
 }
-
-
 
 impl Node {
     fn new(id_: String, name_: String, max_load: f32) -> Node {
@@ -74,8 +74,8 @@ impl Node {
 // otherwise a connection is simply vec<node>
 // if d3 or similar doesn't get used, scrap it?
 struct Link<'d> {
-    source: &'d Node,
-    target: &'d Node
+    source: &'d Member,
+    target: &'d Member
 }
 
 struct Connection<'f> {
@@ -88,7 +88,6 @@ struct Network<'z> {
     servers: Vec<Server<'z>>,
     gateways: Vec<Gateway<'z>>
 }
-
 
 struct Request {
     name: String,
