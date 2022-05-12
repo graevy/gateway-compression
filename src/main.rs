@@ -2,26 +2,32 @@ use std::collections::HashMap;
 
 const id: &str = "id";
 const name: &str = "name";
-struct Node<'a> {
-    id: &'a str,
-    name: &'a str,
-    links: Vec<&'a Member>,
+struct Node {
+    id: String,
+    name: String,
     max_load: f32,
     current_load: f32,
     ticks_to_sleep: u32
 }
-struct Server<'b> {
-    node: &'b Node<'b>,
-    gateway: &'b Gateway<'b>
-}
+
+const client_label: &str = "client_";
 struct Client<'c> {
-    node: &'c Node<'c>,
+    node: Node,
     gateway: &'c Gateway<'c>
 }
-struct Gateway<'d> {
-    node: &'d Node<'d>,
-    clients: Vec<Client<'d>>,
-    servers: Vec<Server<'d>>
+
+const server_label: &str = "server";
+struct Server<'s> {
+    node: Node,
+    gateway: &'s Gateway<'s>
+
+}
+
+const gateway_label: &str = "gateway";
+struct Gateway<'g> {
+    node: Node,
+    clients: Vec<&'g Client<'g>>,
+    servers: Vec<&'g Server<'g>>
 }
 
 enum Member {
@@ -30,15 +36,14 @@ enum Member {
     Gateway
 }
 
-
-
-impl Node<'_> {
-    fn new(id_: &str, name_: &str, max_load: f32) -> Node {
+impl Node {
+    fn new(id_: String, name_: String, max_load: f32) -> Node {
         Node {
-            id: id_, name: name_, links: Vec::new(),
+            id: id_, name: name_,
             max_load: max_load, current_load: 0.0, ticks_to_sleep: 0 }
     }
-    fn serialize(&self) -> HashMap<&str, &str> {
+
+    fn serialize(&self) -> HashMap<&str, &String> {
         // TODO: from rust doc
         // "The default hashing algorithm is currently SipHash 1-3,
         // though this is subject to change at any point in the future.
@@ -49,24 +54,27 @@ impl Node<'_> {
         // The hashing algorithm can be replaced on a per-HashMap basis using
         // the default, with_hasher, and with_capacity_and_hasher methods."
         HashMap::from([(
-            id, self.id), (name, self.name)
+            id, &self.id), (name, &self.name)
             ])
     }
 
     fn wait(&mut self, duration: u32) {
         self.ticks_to_sleep += duration;
     }
-
-
-
 }
+
+// impl<'a> Client<'a> {
+//     fn generate_request(name: String, time_cost: f32, result: u8) -> Request {
+//         Request {name: name, time_cost: time_cost, result: result }
+//     }
+// }
 
 // this struct is used for d3
 // otherwise a connection is simply vec<node>
 // if d3 or similar doesn't get used, scrap it?
-struct Link<'e> {
-    source: &'e Node<'e>,
-    target: &'e Node<'e>
+struct Link<'d> {
+    source: &'d Member,
+    target: &'d Member
 }
 
 struct Connection<'f> {
@@ -80,17 +88,11 @@ struct Network<'z> {
     gateways: Vec<Gateway<'z>>
 }
 
-
-struct Request<'g> {
-    name: &'g str,
+struct Request {
+    name: String,
     time_cost: f32,
     result: u8
 }
-
-enum Action {
-    Request
-}
-
 
 fn main() {
     let net = Network {
