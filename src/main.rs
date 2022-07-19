@@ -1,5 +1,6 @@
 use serde::{Serialize, Serializer, ser::SerializeStruct};
 use std::collections::HashMap;
+use rand::Rng;
 
 
 const id: &str = "id";
@@ -78,11 +79,11 @@ impl Node {
     }
 }
 
-impl<'cr> Client<'cr> {
-    fn generate_request(name_: String, time_cost: f32, result: u8) -> Request {
-        Request {name: name_, time_cost: time_cost, result: result }
-    }
-}
+// impl<'cr> Client<'cr> {
+//     fn generate_request(name_: String, time_cost: f32, result: u8) -> Request {
+//         Request {name: name_, time_cost: time_cost, result: result }
+//     }
+// }
 
 // this struct is used for d3
 // otherwise a connection is simply vec<node>
@@ -96,24 +97,44 @@ struct Connection<'f> {
     links: Vec<&'f Link<'f>>
 }
 
-struct Network<'z> {
-    connections: Vec<Connection<'z>>,
-    clients: Vec<Client<'z>>,
-    servers: Vec<Server<'z>>,
-    gateways: Vec<Gateway<'z>>
-}
-
 struct Request {
     name: String,
     time_cost: f32,
     result: u8
 }
 
+struct Network<'z> {
+    tick: u128,
+    connections: Vec<Connection<'z>>,
+    clients: Vec<Client<'z>>,
+    servers: Vec<Server<'z>>,
+    gateways: Vec<Gateway<'z>>,
+    requests: Vec<Request>
+}
+
+
+
 fn main() {
-    let net: Network = Network {
+    let net= Network {
+        tick: 0,
         connections: Vec::new(),
         clients: Vec::new(),
         servers: Vec::new(),
-        gateways: Vec::new()
+        gateways: Vec::new(),
+        requests: Vec::new()
     };
+
+    for i in 1..=30 {
+
+        let node_label = format!("{},{}", client_label, i.to_string());
+        let node_max_load = rand::thread_rng().gen_range(50..150);
+
+        net.clients.push(
+            Client (
+                Node(node_label, node_max_load),
+                Gateway()
+            )
+
+        )
+    }
 }
